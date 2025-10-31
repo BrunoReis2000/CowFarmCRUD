@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title><%= title %></title>
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.8/css/bootstrap.min.css"
+        integrity="sha512-2bBQCjcnw658Lho4nlXJcc6WkV/UxpE/sAokbXPxQNGqmNdQrWqtw26Ns9kFF/yG792pKR1Sx8/Y1Lf1XN4GKA=="
+        crossorigin="anonymous"
+        referrerpolicy="no-referrer"
+    />
+    <script
+        src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.8/js/bootstrap.bundle.min.js"
+        integrity="sha512-HvOjJrdwNpDbkGJIG2ZNqDlVqMo77qbs4Me4cah0HoDrfhrbA+8SBlZn1KrvAQw7cILLPFJvdwIgphzQmMm+Pw=="
+        crossorigin="anonymous"
+        referrerpolicy="no-referrer"
+    ></script>
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css"
+        integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw=="
+        crossorigin="anonymous"
+        referrerpolicy="no-referrer"
+    />
+    </head>
+    <body>
+<nav class="navbar sticky-top navbar-expand-lg navbar-dark bg-dark">
+    <div class="container-fluid">
+        <!-- Brand -->
+        <a class="navbar-brand" href="#">Calçada's Farm</a>
+
+        <!-- group mobile controls to the right so cow sits just left of the burger -->
+        <div class="d-flex align-items-center ms-auto">
+            <button type="button" class="btn btn-dark nav-item d-lg-none me-2" id="addCowBtnMobile" data-bs-toggle="modal" data-bs-target="#addCowModal" aria-label="Add cow">
+                <i class="fa-solid fa-cow fa-beat fa-2xl" style="color: #63E6BE; --fa-animation-duration: 1s; --fa-animation-iteration-count: 2; --fa-animation-timing: ease-in-out;"></i>
+            </button>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+        </div>
+
+        <!-- Itens da navbar -->
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a class="nav-link active" href="#">Home</a>
+                </li>
+            </ul>
+
+            <!-- visible on large screens: placed left of the search bar -->
+            <button type="button" class="btn btn-dark nav-item d-none d-lg-inline-flex me-2" id="addCowBtnLg"data-bs-toggle="modal" data-bs-target="#addCowModal" aria-label="Add cow" style="height: 38px; line-height: 38px; display: inline-flex; align-items: center;">               <i class="fa-solid fa-cow fa-beat fa-2xl" style="color: #63E6BE; --fa-animation-duration: 1s; --fa-animation-iteration-count: 2; --fa-animation-timing: ease-in-out;"></i>
+            </button>
+
+            <!-- Barra de pesquisa -->
+            <form class="d-flex" role="search">
+                <input class="form-control me-2" type="search" placeholder="Pesquisar" aria-label="Pesquisar">
+                <button class="btn btn-outline-light" type="submit">Pesquisar</button>
+            </form>
+        </div>
+    </div>
+</nav>
+
+<!-- Add Cow Modal -->
+<div class="modal fade" id="addCowModal" tabindex="-1" aria-labelledby="addCowModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form id="addCowForm" method="post" action="/cows">
+        <div class="modal-header">
+          <h5 class="modal-title" id="addCowModalLabel">Add Cow</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label for="cowName" class="form-label">Name</label>
+            <input type="text" class="form-control" id="cowName" name="name" required>
+          </div>
+          <div class="mb-3">
+            <label for="cowTag" class="form-label">Tag</label>
+            <input type="text" class="form-control" id="cowTag" name="tag">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-success">Add Cow</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
