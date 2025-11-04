@@ -33,6 +33,8 @@ app.use((req, res, next) => {
 });
 
 
+app.use(express.static("uploads"));
+
 //set template engine - allows to use dynamic HTML pages with embeded js directly in html
 app.set('view engine', 'ejs');
 

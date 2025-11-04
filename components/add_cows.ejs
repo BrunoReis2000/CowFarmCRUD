@@ -11,7 +11,7 @@
         <div class="modal-body">
           <div class="mb-3">
               <label for="formFile" class="form-label">Default file input example</label>
-              <input class="form-control" type="file" id="formFile">
+              <input class="form-control" type="file" id="formFile" name="image">
           </div>
           <div class="mb-3">
             <label for="tag" class="form-label">Tag</label>
@@ -19,15 +19,15 @@
           </div>
           <div class="mb-3">
             <label for="weight" class="form-label">Weight</label>
-            <input type="number" step=".001" class="form-control" id="cowWeight" name="tag">
+            <input type="number" step=".001" class="form-control" id="cowWeight" name="weight" placeholder="450.256">
           </div>
           <div class="mb-3">
-            <label for="bcount" class="form-label">Breeding Count</label>
-            <input type="number" class="form-control" id="cowBreedCount" name="tag">
+            <label for="breedCount" class="form-label">Breeding Count</label>
+            <input type="number" class="form-control" id="cowBreedCount" name="breedCount" placeholder="3">
           </div>
           <div class="mb-3">
-            <label for="ltbreed" class="form-label">Last Time Breed</label>
-            <input type="date" class="form-control" id="cowLAstTimeBreed" name="tag">
+            <label for="lastTimeCalved" class="form-label">Last Time Calved</label>
+            <input type="date" class="form-control" id="cowlastTimeCalved" name="lastTimeCalved" placeholder="15-08-2023">
           </div>
         </div>
         <div class="modal-footer">
