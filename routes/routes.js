@@ -2,6 +2,8 @@ const express = require('express');
 const router = express.Router();
 const Cow = require('../models/cows');
 const multer = require('multer');
+const fs = require('fs');
+const { type } = require('os');
 
 //image Storage
 var storage = multer.diskStorage({
@@ -14,6 +16,11 @@ var storage = multer.diskStorage({
 });
 
 var upload = multer({ storage: storage }).single('image');
+
+
+
+
+
 
 router.post('/add', upload, async (req, res) => {
     try {
@@ -28,13 +35,12 @@ router.post('/add', upload, async (req, res) => {
         await cow.save(); // save() returns a Promise now
         req.session.message = { type: 'success', message: 'Cow added successfully!' };
         res.redirect('/');
+        console.log(req.session.message);
+        
     } catch (err) {
         res.json({ message: err.message, type: 'danger' });
     }
 });
-
-
-
 
 
 //get all animals route
@@ -53,5 +59,64 @@ router.get('/', async (req, res) => {
     }
 });
 
+
+router.post('/update/:cowId', upload, async (req, res) => {
+    const id = req.params.cowId;
+    let newImage = '';
+
+    if (req.file) {
+        newImage = req.file.filename;
+        try {
+            fs.unlinkSync('./uploads/' + req.body.old_image);
+        } catch (err) {
+            console.log(err);
+        }
+    } else {
+        newImage = req.body.old_image;
+    }
+
+    try {
+        await Cow.findByIdAndUpdate(id, {
+            image: newImage,
+            tag: req.body.tag,
+            weight: req.body.weight,
+            breedCount: req.body.breedCount,
+            lastTimeCalved: req.body.lastTimeCalved,
+        });
+
+        req.session.message = {
+            type: "success",
+            message: "Cow updated successfully!",
+        };
+    } catch (err) {
+        res.json({ message: err.message, type: "danger" });
+    }
+});
+
+
+router.get('/delete/:cowId', async (req, res) => {
+    const id = req.params.cowId;
+
+    try {
+        const result = await Cow.findByIdAndDelete(id);
+
+        if (result && result.image) {
+            try {
+                fs.unlinkSync('./uploads/' + result.image);
+            } catch (err) {
+                console.log('Error deleting image:', err);
+            }
+        }
+
+        req.session.message = {
+            type: 'info',
+            message: 'Cow deleted successfully!',
+        };
+        res.redirect('/');
+    } catch (err) {
+        console.log(err);
+        res.json({ message: err.message, type: 'danger' });
+    }
+});
 
 module.exports = router;
