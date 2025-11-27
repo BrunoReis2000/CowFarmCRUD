@@ -25,7 +25,7 @@ app.use(express.static(path.resolve('components')));
 
 //esconder o secret no .env e meter o .env no .gitignore
 app.use(session({
-    secret: 'your_secret_key',
+    secret: process.env.SECRET,
     saveUninitialized: true,
     resave: false
 }));
