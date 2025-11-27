@@ -25,9 +25,13 @@ app.use(express.static(path.resolve('components')));
 
 //esconder o secret no .env e meter o .env no .gitignore
 app.use(session({
-    secret: process.env.SECRET,
+    secret: process.env.SECRET || 'fallback_secret',
     saveUninitialized: true,
-    resave: false
+    resave: false,
+    cookie: {
+        secure: false, // Render free tier does NOT require HTTPS inside the container
+        maxAge: 1000 * 60 * 60 * 24 // 1 day
+    }
 }));
 
 app.use((req, res, next) => {
