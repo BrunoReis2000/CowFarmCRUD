@@ -1,0 +1,87 @@
+<!-- Info Sheep Modal -->
+<div
+  class="modal fade"
+  id="infoSheepModal"
+  tabindex="-1"
+  aria-labelledby="infoSheepModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form id="infoSheepForm" method="post">
+        <div class="modal-header text-center">
+          <h5 class="modal-title w-100" id="infoSheepModalLabel">Ovelha</h5>
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="modal"
+            aria-label="Close"
+          ></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label for="sheepTag" class="form-label">Identificação</label>
+            <input
+              type="number"
+              class="form-control"
+              id="InfosheepTag"
+              name="tag"
+              readonly
+            />
+          </div>
+          <div class="mb-3">
+            <label for="sheepcheckDigit" class="form-label">Check Digit</label>
+            <input
+              type="number"
+              class="form-control"
+              id="InfosheepcheckDigit"
+              name="checkDigit"
+              readonly
+            />
+          </div>
+          <div class="mb-3">
+            <label for="sheepBreedCount" class="form-label">Nº de Pariçoes</label>
+            <input
+              type="number"
+              class="form-control"
+              id="InfosheepBreedCount"
+              name="breedCount"
+              readonly
+            />
+          </div>
+          <div class="mb-3">
+            <label for="sheeplastTimeCalved" class="form-label">Data da última parição</label>
+            <input
+              type="date"
+              class="form-control"
+              id="InfosheeplastTimeCalved"
+              name="lastTimeCalved"
+              readonly
+            />
+          </div>
+          <div class="mb-3">
+            <label for="sheepdateOfLastSanitation" class="form-label">Data da última intervenção sanitária</label>
+            <input
+              type="date"
+              class="form-control"
+              id="InfosheepdateOfLastSanitation"
+              name="lastTimeSanitized"
+              readonly
+            />
+          </div>
+          <div class="mb-3">
+            <label for="comments" class="form-label">Comentários/Observaçoes</label>
+            <textarea class="form-control" id="InfosheepComments" name="comments" placeholder="Escreve aqui os teus comentarios..." rows="2" cols="30" readonly></textarea>
+          </div>
+        </div>
+          
+        <div class="modal-footer">
+          <input type="hidden" name="id" id="InfosheepId"/>
+          <button type="button" class="btn btn-success" id="sheepinfoEditBtn">Editar</button>
+          <button type="button" class="btn btn-danger" id="sheepinfoDeleteBtn" data-bs-dismiss="modal"> Eliminar</button>
+          
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

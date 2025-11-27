@@ -1,16 +1,16 @@
-<!-- Edit Cow Modal -->
+<!-- Edit Sheep Modal -->
 <div
   class="modal fade"
-  id="editCowModal"
+  id="editSheepModal"
   tabindex="-1"
-  aria-labelledby="editCowModalLabel"
+  aria-labelledby="editSheepModalLabel"
   aria-hidden="true"
 >
-  <div class="modal-dialog">
+   <div class="modal-dialog">
     <div class="modal-content">
-      <form id="editCowForm" method="post">
+      <form id="editSheepForm" method="post">
         <div class="modal-header text-center">
-          <h5 class="modal-title w-100" id="editCowModalLabel">Editar Vaca</h5>
+          <h5 class="modal-title w-100" id="editSheepModalLabel">Editar Ovelha</h5>
           <button
             type="button"
             class="btn-close"
@@ -20,66 +20,59 @@
         </div>
         <div class="modal-body">
           <div class="mb-3">
-            <label for="cowTag" class="form-label">Identificação</label>
+            <label for="sheepTag" class="form-label">Identificação</label>
             <input
               type="number"
               class="form-control"
-              id="EditcowTag"
+              id="EditsheepTag"
               name="tag"
             />
           </div>
           <div class="mb-3">
-            <label for="cowcheckDigit" class="form-label">Check Digit</label>
+            <label for="sheepcheckDigit" class="form-label">Check Digit</label>
             <input
               type="number"
               class="form-control"
-              id="EditcowcheckDigit"
+              id="EditsheepcheckDigit"
               name="checkDigit"
             />
           </div>
           <div class="mb-3">
-            <label for="race">Raça:</label>
-              <select class="form-control" id="EditcowRace" name="race">
-                <option value="Angus">Angus</option>
-                <option value="Limousin">Limousin</option>
-              </select>
-          </div>
-          <div class="mb-3">
-            <label for="cowBreedCount" class="form-label">Nº de Parições</label>
+            <label for="sheepBreedCount" class="form-label">Nº de Parições</label>
             <input
               type="number"
               class="form-control"
-              id="EditcowBreedCount"
+              id="EditsheepBreedCount"
               name="breedCount"
             />
           </div>
           <div class="mb-3">
-            <label for="cowlastTimeCalved" class="form-label">Data da última parição</label>
+            <label for="sheeplastTimeCalved" class="form-label">Data da última parição</label>
             <input
               type="date"
               class="form-control"
-              id="EditcowlastTimeCalved"
+              id="EditsheeplastTimeCalved"
               name="lastTimeCalved"
             />
           </div>
           <div class="mb-3">
-            <label for="cowdateOfLastSanitation" class="form-label">Data da última intervenção sanitária</label>
+            <label for="sheepdateOfLastSanitation" class="form-label">Data da última intervenção sanitária</label>
             <input
-              type="date"
-              class="form-control"
-              id="EditdateOfLastSanitation"
-              name="lastTimeSanitized"
-            />
-          </div>
+            type="date"
+            class="form-control"
+            id="EditsheepdateOfLastSanitation"
+            name="dateOfLastSanitation"
+          />
 
           <div class="my-3">
             <label for="comments" class="form-label">Comentários/Observaçoes</label>
-            <textarea class="form-control" id="EditcowComments" name="comments" placeholder="Escreve aqui os teus comentarios..." rows="2" cols="30"></textarea>
+            <textarea class="form-control" id="EditsheepComments" name="comments" placeholder="Escreve aqui os teus comentarios..." rows="2" cols="30"></textarea>
           </div>
+
         </div>
           
         <div class="modal-footer">
-          <input type="hidden" name="id" id="EditcowId" />
+          <input type="hidden" name="id" id="EditsheepId" />
           <button
             type="button"
             class="btn btn-secondary"

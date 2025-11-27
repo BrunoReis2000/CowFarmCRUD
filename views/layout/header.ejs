@@ -5,25 +5,67 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title><%= title %></title>
+    
+    <!-- Small inline: restore a dataset for initial paint only (safe, doesn't touch DOM nodes) -->
+    <script>
+      (function () {
+        const activeView = sessionStorage.getItem('activeView');
+        const activeBreed = sessionStorage.getItem('activeBreed');
+        // Keep the logic you had: if activeView is "cow" use the breed, else use the activeView
+        const savedViewInstant = activeView === 'cow' ? activeBreed : activeView;
+        if (savedViewInstant) {
+          document.documentElement.dataset.view = savedViewInstant;
+          window.savedViewInstant = savedViewInstant;
+        } else {
+          // sensible default
+          document.documentElement.dataset.view = 'Angus';
+          window.savedViewInstant = 'Angus';
+        }
+      })();
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js" integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdn.datatables.net/v/bs5/dt-2.3.4/datatables.min.js" integrity="sha384-jVoHjtunWKmr2zpSki5PSXfFYRsTQQm1uk4wpf45zuYxast668XkB2fJL8PjloNc" crossorigin="anonymous"></script>
+    <!-- Styles & libs -->
     <link
       href="https://cdn.datatables.net/v/bs5/dt-2.3.4/datatables.min.css"
       rel="stylesheet"
       integrity="sha384-i0jVPhw/X00l5EPvMOBv0lcGYXlSQGOqNYpMK/406rxta9oBump0IZJIHzvtf3+H"
       crossorigin="anonymous"
     />
+    
+    <!-- Single bootstrap include (avoid duplicates) -->
     <link
       rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.8/css/bootstrap.min.css"
-      integrity="sha512-2bBQCjcnw658Lho4nlXJcc6WkV/UxpE/sAokbXPxQNGqmNdQrWqtw26Ns9kFF/yG792pKR1Sx8/Y1Lf1XN4GKA=="
-      crossorigin="anonymous"
-      referrerpolicy="no-referrer"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
     />
-    <script
-      src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.8/js/bootstrap.bundle.min.js"
-      integrity="sha512-HvOjJrdwNpDbkGJIG2ZNqDlVqMo77qbs4Me4cah0HoDrfhrbA+8SBlZn1KrvAQw7cILLPFJvdwIgphzQmMm+Pw=="
-      crossorigin="anonymous"
-      referrerpolicy="no-referrer"
-    ></script>
+    <script>
+document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.infoCowBtn').forEach(row => {
+        row.addEventListener('click', (e) => {
+
+            // impedir cliques nos botões de ações
+            if (e.target.closest('.actions-cell')) return;
+
+            const modal = new bootstrap.Modal(document.getElementById('infoCowModal'));
+            modal.show();
+        });
+    });
+});
+document.addEventListener('DOMContentLoaded', () => {
+document.querySelectorAll('.infoSheepBtn').forEach(row => {
+        row.addEventListener('click', (e) => {// IF click was inside actions-cell → do NOTHING
+
+            // impedir cliques nos botões de ações
+            if (e.target.closest('.actions-cell-sheep')) return;
+
+            const modal = new bootstrap.Modal(document.getElementById('infoSheepModal'));
+            modal.show();
+        });
+    });
+});
+</script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" defer></script>
+
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css"
@@ -31,95 +73,715 @@
       crossorigin="anonymous"
       referrerpolicy="no-referrer"
     />
-  </head>
-  <body>
-    <nav class="navbar sticky-top navbar-expand-lg navbar-dark bg-dark">
-      <div class="container-fluid">
-        <!-- Brand -->
-        <a class="navbar-brand" href="#">Calçada's Farm</a>
+    <style>
+.deleteCowBtn {
+   z-index: 1 !important;
+    
+}
+.editSheepBtn {
+    background: none !important;
+    border: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    box-shadow: none !important;
+    
+}
+.editSheepBtn:focus {
+    outline: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+}
+td.actions-cell {
+    display: flex;
+    align-items: center;
+     /* spacing between edit/delete */
+    justify-content: space-evenly; /* or flex-start / flex-end */
+}
 
-        <!-- group mobile controls to the right so cow sits just left of the burger -->
-        <div class="d-flex align-items-center ms-auto">
-          <button
-            type="button"
-            href="/add"
-            class="btn btn-dark nav-item d-lg-none me-2"
-            id="addCowBtnMobile"
-            data-bs-toggle="modal"
-            data-bs-target="#addCowModal"
-            aria-label="Add cow"
-          >
-            <i
-              class="fa-solid fa-cow fa-beat fa-2xl"
-              style="
-                color: #63e6be;
-                --fa-animation-duration: 1s;
-                --fa-animation-iteration-count: 2;
-                --fa-animation-timing: ease-in-out;
-              "
-            ></i>
-          </button>
-          <button
-            class="navbar-toggler"
-            type="button"
-            data-bs-toggle="collapse"
-            data-bs-target="#navbarSupportedContent"
-            aria-controls="navbarSupportedContent"
-            aria-expanded="false"
-            aria-label="Toggle navigation"
-          >
-            <span class="navbar-toggler-icon"></span>
-          </button>
+
+.table-striped>tbody>tr:nth-child(even)>td,
+.table-striped>tbody>tr:nth-child(even)>th {
+   background-color: #2a2d33;
+ }
+
+ /* Hover color for ANY row */
+.table-hover tbody tr:hover td,
+.table-hover tbody tr:hover th {
+    background-color: #2a6352 !important; /* pick your color */
+    cursor: pointer;
+}
+.pagination .page-item .page-link {
+  background-color: #f8f9fa;
+  border: 1px solid #dee2e6;
+  color: #63E6BE;
+  font-weight: 500;
+  padding: 6px 12px;
+  min-width: 40px;
+  text-align: center;
+  transition: all 0.2s ease-in-out;
+}
+
+/* Hover effect for page link and icons */
+.pagination .page-item .page-link:hover {
+  background-color:#2a2f33 ;
+  color: #fff;
+  border-color: #2a2f33;
+}
+
+/* Make icons white on hover */
+.pagination .page-item .page-link:hover i {
+  color: #fff !important;
+}
+
+/* Active page */
+.pagination .page-item.active .page-link {
+  background-color: #63E6BE;
+  color: #fff;
+  border-color: #63E6BE;
+}
+
+/* Disabled buttons */
+.pagination .page-item.disabled .page-link {
+  background-color: #e9ecef;
+  color: #adb5bd;
+  border-color: #dee2e6;
+}
+
+
+
+
+
+
+      /* Your original styles (unchanged, only formatting trimmed slightly) */
+      @media (min-width: 769px) {
+        .sidebar {
+  position: relative;
+  z-index: 99999999; /* ALMOST always works */
+}
+
+        .topnotch {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%) translateX(42.5px); /* center, then shift */
+  display: flex;
+  justify-content: center;
+  width: max-content; /* auto-size to SVG */
+}
+        /* Remove from sidebar flow */
+        #addBtnBack {
+          position: fixed;
+          bottom: 30px;
+          right: 30px;
+          width: 80px;
+          height: 80px;
+          background-color: #2a2f33;
+          border-radius: 50%;
+          z-index: 999;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          transition: background-color 0.3s ease;
+          z-index: 9999999 !important;
+        }
+        #addBtnBack:hover {
+          background-color: #3a3f44;
+        }
+        #addBtnBack #addBtn {
+          width: 80px;
+          height: 80px;
+          border-radius: 50%;
+          background-color: #2a2f33;
+          border-color: #2a2f33;
+          transition: background-color 0.3s ease;
+        }
+        #addBtnBack:hover #addBtn {
+          background-color: #3a3f44;
+          border-color: #3a3f44;
+        }
+      }
+
+      #separator {
+        background-color: #212529;
+        transform: translateY(-8px);
+        box-shadow: 0 -4px 8px rgba(0, 0, 0, 0.3);
+        border-top-left-radius: 12px;
+        border-top-right-radius: 12px;
+        background-color: #2a2f33;
+        transition: all 0.2s ease;
+      }
+
+      .sidebar {
+        width: 85px;
+        height: 100vh;
+        position: fixed;
+        left: 0;
+        top: 0;
+        background-color: #212529;
+        display: flex;
+        flex-direction: column;
+        padding: 20px 15px;
+        color: white;
+      }
+
+      .sidebar-brand {
+        font-size: 0.8rem;
+        text-align: left;
+        font-weight: bold;
+        margin-bottom: 30px;
+      }
+
+      .sidebar-buttons {
+        margin-top: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+      }
+
+      .sidebar-buttons button svg {
+        overflow: visible;
+      }
+
+      body {
+        margin-left: 5.3rem;
+        background-color: #f8f9fa;
+      }
+
+      /* Mobile bottom bar */
+      @media (max-width: 768px) {
+        .col-hide-m {
+        display: none !important;
+        }
+
+        table {
+  table-layout: auto;
+  width: 100%;
+}
+
+td, th {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+
+        .topnotch {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          display: flex;
+          justify-content: center;
+        }
+        .sidebar {
+          width: 100%;
+          height: 70px;
+          position: fixed;
+          bottom: 0;
+          top: auto;
+          left: 0;
+          flex-direction: row;
+          justify-content: center;
+          align-items: center;
+          border-top: 1px solid #444;
+          z-index: 4;
+        }
+        .sidebar-brand {
+          display: none;
+        }
+        .sidebar-buttons {
+          margin-top: 20px;
+          flex-direction: row;
+          gap: 20px;
+          width: 100%;
+          justify-content: center;
+        }
+        body {
+          margin-left: 0;
+          padding-bottom: 80px;
+        }
+        .sidebar-buttons button {
+          width: 55px !important;
+          height: 55px;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          padding: 0 !important;
+        }
+        .sidebar-buttons button svg,
+        .sidebar-buttons button i {
+          margin: 0 auto;
+        }
+        .sidebar-buttons button svg {
+          margin-bottom: 5px;
+        }
+        /* order of the buttons */
+        #cowBtn {
+          order: 1;
+        }
+        #addBtnBack {
+          order: 2;
+        }
+        #sheepBtn {
+          order: 3;
+        }
+
+        #addBtnBack {
+          display: flex;
+          width: 80px;
+          height: 80px;
+          background-color: #2a2f33;
+          border-radius: 100%;
+          z-index: 2;
+          position: relative;
+          bottom: 20px;
+          align-items: center;
+          justify-content: center;
+          transition: background-color 0.3s ease;
+        }
+        #addBtnBack:hover {
+          background-color: #3a3f44;
+        }
+        #addBtnBack #addBtn {
+          position: relative;
+          z-index: 2;
+          background-color: #2a2f33;
+          border-color: #2a2f33;
+          width: 80px;
+          height: 80px;
+          border-radius: 100%;
+          transition: background-color 0.3s ease;
+        }
+        #addBtnBack:hover #addBtn {
+          background-color: #3a3f44;
+          border-color: #3a3f44;
+        }
+
+        .sidebar-buttons #cowDropdown {
+          display: block;
+          justify-content: left;
+          padding-left: 20px;
+        }
+        .sidebar-buttons button .dropdown-item {
+          width: 55px !important;
+          height: 55px;
+        }
+      }
+
+      #sheepBtn,
+      #cowBtn {
+        fill: #919b98;
+        color: #919b98;
+        position: relative;
+      }
+
+      .selected {
+        fill: #63e6be !important;
+        color: #63e6be !important;
+      }
+
+      #sheepBtn::before,
+      #cowBtn::before {
+        content: "";
+        position: absolute;
+        bottom: -2px;
+        background-color: #919b98;
+        height: 5px;
+        width: 40px;
+        border-radius: 8px;
+        opacity: 0;
+        transition: bottom 0.8s ease, opacity 0.8s ease;
+      }
+
+      #sheepBtn:hover::before,
+      #cowBtn:hover::before {
+        opacity: 1;
+        bottom: -7px;
+      }
+
+      #sheepBtn.selected::before,
+      #cowBtn.selected::before {
+        opacity: 1;
+        bottom: -2px;
+        background-color: #63e6be;
+        box-shadow: 0 -4px 8px rgba(0, 0, 0, 0.3);
+      }
+
+      #sheepBtn.selected:hover::before,
+      #cowBtn.selected:hover::before {
+        opacity: 1;
+        bottom: -7px;
+        background-color: #63e6be;
+        box-shadow: 0 -4px 8px rgba(0, 0, 0, 0.3);
+      }
+
+      /* Floating dropdown */
+      .floating-dropdown {
+        position: absolute;
+        background: #2a2f33;
+        border-radius: 12px;
+        padding: 10px 0 !important;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+        z-index: 9999 !important;
+        width: 140px;
+        opacity: 0;
+        transform: translateY(10px);
+        pointer-events: none;
+        transition: 0.25s ease;
+      }
+
+      .floating-dropdown.show {
+        opacity: 1;
+        transform: translateY(0px);
+        pointer-events: all;
+      }
+
+      .floating-dropdown .dropdown-item {
+        display: block;
+        background: none;
+        border: none;
+        width: 100% !important;
+        text-align: left;
+        color: #eee;
+        padding: 10px 15px;
+        font-size: 0.95rem;
+        appearance: none;
+        padding-left: 10px !important;
+      }
+
+      .floating-dropdown .dropdown-item:hover,
+      .floating-dropdown .dropdown-item.active {
+        background-color: #3a3f44;
+        cursor: pointer;
+      }
+
+      /* Hide utility */
+      .hide {
+        display: none !important;
+      }
+      
+    </style>
+    
+  </head>
+
+  <body>
+    <div class="sidebar">
+      <!-- Brand at the top -->
+      <div class="sidebar-brand">AGRO CALÇADA LDA</div>
+
+      <!-- Buttons at the bottom -->
+      <div class="sidebar-buttons">
+        <!-- Cow button -->
+        <button
+          type="button"
+          class="btn btn-dark"
+          id="cowBtn"
+          aria-label="Cow"
+          style="height: 48px; display: flex; align-items: center; justify-content: center;"
+        >
+          <i class="fa-solid fa-cow fa-2xl"></i>
+        </button>
+
+        <!-- Cow dropdown -->
+        <div id="cowDropdown" class="floating-dropdown hide" role="menu" aria-hidden="true">
+          <button class="dropdown-item" data-breed="Angus" data-default="true">Angus</button>
+          <button class="dropdown-item" data-breed="Limousine">Limousine</button>
         </div>
 
-        <!-- Itens da navbar -->
-        <div
-          class="collapse navbar-collapse flex-grow-0"
-          id="navbarSupportedContent"
+        <!-- Sheep button -->
+        <button
+          type="button"
+          class="btn btn-dark"
+          id="sheepBtn"
+          aria-label="Sheep"
+          style="height: 48px; display: flex; align-items: center; justify-content: center;"
         >
-          <!-- visible on large screens: placed left of the search bar -->
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 582" style="width: 45px; height: 40px;">
+            <g xmlns="http://www.w3.org/2000/svg" transform="translate(-450,850) scale(0.19,-0.19)" stroke="none">
+              <path d="M5875 4275 c-5 -1 -37 -11 -70 -20 -33 -10 -64 -21 -69 -26 -6 -5 -18 -9 -27 -9 -28 0 -173 -114 -226 -177 -26 -32 -64 -66 -83 -75 -19 -8 -62 -28 -95 -43 -33 -15 -78 -35 -101 -46 -22 -10 -45 -19 -50 -19 -23 0 -85 -54 -99 -87 -59 -141 77 -266 217 -199 75 36 72 45 79 -269 6 -309 9 -327 76 -439 72 -118 203 -216 327 -242 85 -18 356 -18 444 1 99 20 183 68 257 146 63 67 79 92 118 184 19 46 21 75 26 340 6 288 6 290 28 293 12 2 36 -4 54 -14 45 -23 118 -22 160 2 21 12 43 38 57 66 43 87 10 164 -91 211 -167 79 -208 97 -217 97 -14 0 -87 47 -91 58 -9 23 -88 107 -129 137 -124 91 -257 136 -399 134 -47 0 -90 -2 -96 -4z m67 -650 c15 -14 30 -36 34 -50 10 -39 -14 -92 -50 -115 -49 -30 -82 -26 -123 15 -33 33 -35 39 -30 82 7 62 41 93 100 93 31 0 49 -7 69 -25z m421 -5 c35 -40 41 -64 27 -105 -13 -38 -63 -75 -103 -75 -15 0 -40 14 -61 34 -46 43 -50 98 -10 145 22 27 32 31 74 31 41 0 52 -4 73 -30z"/>
+              <path d="M4395 4054 c-49 -16 -142 -72 -165 -99 -18 -22 -33 -19 -115 21 -73 36 -74 36 -187 32 -100 -3 -120 -7 -171 -31 -79 -39 -156 -117 -196 -199 -32 -68 -33 -68 -74 -68 -55 0 -161 -27 -219 -56 -66 -33 -144 -117 -181 -194 -27 -57 -31 -78 -35 -170 l-4 -105 -60 -54 c-70 -63 -99 -107 -128 -187 -25 -73 -27 -199 -4 -252 47 -109 87 -164 154 -213 l40 -29 0 -88 c0 -136 39 -230 131 -319 58 -56 155 -103 211 -103 85 0 93 -16 144 -325 7 -44 20 -116 29 -160 9 -44 19 -98 22 -120 12 -82 69 -157 134 -175 18 -6 99 -10 178 -10 169 0 206 12 256 83 l30 42 5 195 c6 226 4 223 96 161 152 -101 350 -90 488 26 21 17 32 21 40 13 6 -6 11 -78 13 -189 2 -201 10 -230 77 -289 46 -40 74 -45 253 -40 142 3 152 4 189 29 47 31 88 109 98 184 4 28 14 84 22 125 9 41 20 98 25 125 5 28 16 84 25 125 8 41 18 94 21 118 7 54 40 82 96 82 93 0 235 105 294 217 32 61 57 162 51 204 -3 23 -8 24 -93 32 -172 14 -247 33 -355 91 -178 94 -299 242 -361 442 -17 54 -23 106 -28 238 -5 136 -9 170 -21 176 -8 5 -35 16 -60 26 -175 69 -271 274 -216 459 13 42 13 52 1 76 -22 41 -92 97 -165 131 -81 38 -204 48 -285 22z"/>
+            </g>
+          </svg>
+        </button>
+
+        <!-- Add button -->
+        <div id="addBtnBack">
           <button
             type="button"
-            class="btn btn-dark nav-item d-none d-lg-inline-flex me-2"
-            id="addCowBtnLg"
-            data-bs-toggle="modal"
-            data-bs-target="#addCowModal"
-            aria-label="Add cow"
-            style="
-              height: 38px;
-              line-height: 38px;
-              display: inline-flex;
-              align-items: center;
-            "
+            class="btn btn-dark"
+            id="addBtn"
+            aria-label="Add"
+            style="height: 48px; display: flex; align-items: center; justify-content: center;"
           >
-            <i
-              class="fa-solid fa-cow fa-beat fa-2xl"
-              style="
-                color: #63e6be;
-                --fa-animation-duration: 1s;
-                --fa-animation-iteration-count: 2;
-                --fa-animation-timing: ease-in-out;
-              "
-            ></i>
+            <i class="fa-solid fa-circle-plus fa-2xl" style="color: #63e6be;"></i>
           </button>
-
-          <!-- Barra de pesquisa -->
-          <!-- mt-lg-0 means margin top on large screens equals 0 -->
-          <form class="d-flex mb-0 mt-lg-0 mt-3" role="search">
-            <input
-              class="form-control me-2"
-              type="search"
-              placeholder="Pesquisar"
-              aria-label="Pesquisar"
-            />
-            <button class="btn btn-outline-light" type="submit">
-              Pesquisar
-            </button>
-          </form>
         </div>
       </div>
-    </nav>
+    </div>
 
+    <!-- Your modals / includes remain as EJS includes (unchanged) -->
     <%- include('../../components/add_cows') %>
+    <%- include('../../components/add_sheep') %>
+
+    <!-- MAIN JS (consolidated & robust) -->
+    <script>
+      (function () {
+        /**
+         * Consolidated JS block:
+         * - Waits for DOMContentLoaded
+         * - Finds elements with defensive checks
+         * - Provides safe updateTableVisibility() that won't crash if some nodes are missing
+         * - Combines dropdown logic and saved view handling
+         */
+
+        function safeQuery(id) {
+          return document.getElementById(id) || null;
+        }
+
+        // updateTableVisibility is safe if elements are missing
+        function updateTableVisibility(view) {
+          const notch = safeQuery('breedLabel');
+          const topnotch = safeQuery('topnotch');
+          const cowBtn = safeQuery('cowBtn');
+          const sheepBtn = safeQuery('sheepBtn');
+          const cowTableAngus = safeQuery('cowTableContainerAngus');
+          const cowTableLimousine = safeQuery('cowTableContainerLimousine');
+          const sheepTable = safeQuery('sheepTableContainer');
+
+          // Choose modal id by view (but only create modal if element exists)
+          let modalId = '#addCowModal';
+          if (view === 'sheep') modalId = '#addSheepModal';
+
+          // Reset classes safely
+          if (cowBtn) cowBtn.classList.remove('selected');
+          if (sheepBtn) sheepBtn.classList.remove('selected');
+          if (cowTableAngus) cowTableAngus.classList.add('hide');
+          if (cowTableLimousine) cowTableLimousine.classList.add('hide');
+          if (sheepTable) sheepTable.classList.add('hide');
+          if (topnotch) topnotch.classList.add('hide');
+          if (notch) notch.classList.add('hide');
+
+          // Logic
+          if (view === 'cow' || view === 'Angus') {
+            if (cowBtn) cowBtn.classList.add('selected');
+            if (cowTableAngus) cowTableAngus.classList.remove('hide');
+            if (cowTableLimousine) cowTableLimousine.classList.add('hide');
+            if (sheepTable) sheepTable.classList.add('hide');
+            if (topnotch) topnotch.classList.remove('hide');
+            if (notch) {
+              notch.classList.remove('hide');
+              notch.textContent = view;
+            }
+          } else if (view === 'Limousine') {
+            if (cowBtn) cowBtn.classList.add('selected');
+            if (cowTableAngus) cowTableAngus.classList.add('hide');
+            if (cowTableLimousine) cowTableLimousine.classList.remove('hide');
+            if (sheepTable) sheepTable.classList.add('hide');
+            if (topnotch) topnotch.classList.remove('hide');
+            if (notch) {
+              notch.classList.remove('hide');
+              notch.textContent = view;
+            }
+          } else {
+            // default to sheep view
+            if (sheepBtn) sheepBtn.classList.add('selected');
+            if (sheepTable) sheepTable.classList.remove('hide');
+            if (cowTableAngus) cowTableAngus.classList.add('hide');
+            if (cowTableLimousine) cowTableLimousine.classList.add('hide');
+            if (topnotch) topnotch.classList.add('hide');
+            if (notch) notch.classList.add('hide');
+          }
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+          // Cached elements
+          const cowBtn = safeQuery('cowBtn');
+          const sheepBtn = safeQuery('sheepBtn');
+          const addBtnBack = safeQuery('addBtnBack');
+          const cowDropdown = safeQuery('cowDropdown');
+          const sidebar = document.querySelector('.sidebar') || null;
+
+          // Use previously set window.savedViewInstant (head script) or fallback
+          const savedViewFromHead = window.savedViewInstant || null;
+          // Determine what to restore: if activeView === 'cow' we want activeBreed; else activeView
+          const activeView = sessionStorage.getItem('activeView');
+          const activeBreed = sessionStorage.getItem('activeBreed');
+
+          let initialView = savedViewFromHead || (activeView === 'cow' ? activeBreed : activeView) || 'Angus';
+
+          // Restore UI state
+          updateTableVisibility(initialView);
+
+          // Setup modals lazily
+          function getModalForCurrentView(view) {
+            const id = view === 'sheep' ? '#addSheepModal' : '#addCowModal';
+            const el = document.querySelector(id);
+            if (!el) return null;
+            try {
+              return new bootstrap.Modal(el);
+            } catch (err) {
+              return null;
+            }
+          }
+
+          // --- Cow / Sheep button handlers ---
+          if (cowBtn) {
+            cowBtn.addEventListener('click', function (ev) {
+              ev.stopPropagation();
+              sessionStorage.setItem('activeView', 'cow');
+
+              const breed = sessionStorage.getItem('activeBreed') || 'Angus';
+              updateTableVisibility(breed);
+
+              // Update dropdown active class safely
+              if (cowDropdown) {
+                cowDropdown
+                  .querySelectorAll('.dropdown-item')
+                  .forEach((item) => item.classList.remove('active'));
+
+                const defaultBtn = cowDropdown.querySelector(`[data-breed="${breed}"]`);
+                if (defaultBtn) defaultBtn.classList.add('active');
+              }
+            });
+          }
+
+          if (sheepBtn) {
+            sheepBtn.addEventListener('click', function () {
+              sessionStorage.setItem('activeView', 'sheep');
+              updateTableVisibility('sheep');
+            });
+          }
+
+          // Add button: open modal for the currently selected view
+          if (addBtnBack) {
+            addBtnBack.addEventListener('click', function () {
+              const curActiveView = sessionStorage.getItem('activeView') || initialView;
+              if (!curActiveView) {
+                alert('Selecione Cow ou Sheep primeiro!');
+                return;
+              }
+
+              // Choose modal based on activeView / breed
+              const isSheep = curActiveView === 'sheep' || curActiveView === 'Sheep';
+              const modal = getModalForCurrentView(isSheep ? 'sheep' : 'cow');
+              if (modal) modal.show();
+              else {
+                // Fallback: if modal not present, notify (so it fails gracefully)
+                console.warn('Modal element not found for view:', curActiveView);
+              }
+            });
+          }
+
+          // --- Dropdown behavior (position + show/hide) ---
+          if (!cowDropdown) {
+            // If dropdown not present, do nothing (component might be omitted)
+            return;
+          }
+
+          function showDropdown() {
+            if (!cowBtn) return;
+            const rect = cowBtn.getBoundingClientRect();
+            const dropdownHeight = cowDropdown.offsetHeight || 120;
+            const dropdownWidth = cowDropdown.offsetWidth || 140;
+            const isMobile = window.innerWidth <= 768;
+            const gap = 12;
+
+            let top, left;
+            if (isMobile && sidebar) {
+              // position above button
+              top = -135;
+            } else {
+              // desktop: below button by default
+              top = rect.bottom + gap + window.scrollY;
+              // if it goes off bottom, position above
+              if (top + dropdownHeight > window.innerHeight + window.scrollY) {
+                top = rect.top - dropdownHeight - gap + window.scrollY;
+              }
+            }
+
+            // center horizontally above/below the button
+            left = rect.left + (rect.width / 2) - (dropdownWidth / 2) + window.scrollX;
+
+            // prevent overflow
+            if (left < 8) left = 8;
+            if (left + dropdownWidth > window.innerWidth - 8) left = window.innerWidth - dropdownWidth - 8;
+            //if (top < 8) top = 8;
+
+            cowDropdown.style.top = `${top}px`;
+            cowDropdown.style.left = `${left}px`;
+            cowDropdown.classList.remove('hide');
+            requestAnimationFrame(() => cowDropdown.classList.add('show'));
+            cowDropdown.setAttribute('aria-hidden', 'false');
+          }
+
+          function hideDropdown() {
+            cowDropdown.classList.remove('show');
+            setTimeout(() => {
+              if (!cowDropdown.classList.contains('show')) {
+                cowDropdown.classList.add('hide');
+                cowDropdown.setAttribute('aria-hidden', 'true');
+              }
+            }, 300); // match CSS transition
+          }
+
+          // Initialize default active breed if missing
+          if (!sessionStorage.getItem('activeBreed')) {
+            sessionStorage.setItem('activeBreed', 'Angus');
+          }
+
+          const defaultBreed = sessionStorage.getItem('activeBreed') || 'Angus';
+          const defaultBtn = cowDropdown.querySelector(`[data-breed="${defaultBreed}"]`);
+          if (defaultBtn) defaultBtn.classList.add('active');
+
+          // Toggle on click
+          cowBtn.addEventListener('click', function (ev) {
+            ev.stopPropagation();
+            if (cowDropdown.classList.contains('show')) {
+              hideDropdown();
+            } else {
+              showDropdown();
+            }
+          });
+
+          // prevent close when clicking inside
+          cowDropdown.addEventListener('click', function (ev) {
+            ev.stopPropagation();
+          });
+
+          // click outside closes
+          document.addEventListener('click', function () {
+            hideDropdown();
+          });
+
+          document.addEventListener('keydown', function (ev) {
+            if (ev.key === 'Escape') hideDropdown();
+          });
+
+          // breed selection
+          cowDropdown.querySelectorAll('.dropdown-item').forEach(function (item) {
+            item.addEventListener('click', function (ev) {
+              // remove active
+              cowDropdown.querySelectorAll('.dropdown-item').forEach((i) => i.classList.remove('active'));
+              item.classList.add('active');
+
+              const breed = item.dataset.breed;
+              sessionStorage.setItem('activeBreed', breed);
+              sessionStorage.setItem('activeView', 'cow'); // selecting breed implies cow view
+              updateTableVisibility(breed);
+              hideDropdown();
+            });
+          });
+
+          // reposition while visible
+          window.addEventListener('resize', function () {
+            if (cowDropdown.classList.contains('show')) showDropdown();
+          });
+          window.addEventListener('scroll', function () {
+            if (cowDropdown.classList.contains('show')) showDropdown();
+          });
+        });
+      })();
+
+    </script>
   </body>
 </html>

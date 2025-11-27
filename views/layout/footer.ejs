@@ -1,16 +1,50 @@
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js" integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-<script src="https://cdn.datatables.net/v/bs5/dt-2.3.4/datatables.min.js" integrity="sha384-jVoHjtunWKmr2zpSki5PSXfFYRsTQQm1uk4wpf45zuYxast668XkB2fJL8PjloNc" crossorigin="anonymous"></script>
+
+
+
 <script>
-    $(document).ready(function () {
-        $('table').DataTable({
-            //paging: true,
-            //searching: true,
-            //info: false,
-            //lengthChange: false,
-            //pageLength: 2
-            order: [[0, 'desc']]
-        });
+$(document).ready(function () {
+    $('table').DataTable({
+        columnDefs: [
+            {
+                targets: "_all",
+                className: "dt-left"
+            }
+        ],
+        //os nulls representam as outras colunas, qualquer adicao ou subtracao de colunas implica mudar esta parte do codigo
+        columns: [
+            null, null, null, null, null,
+            {
+                "render": function(data, type, row){
+                    return data.replace(/\n/g, '<br>');
+                }
+            },
+            null
+        ],
+        language: {
+            sProcessing: "Processando...",
+            sLengthMenu: "Mostrar _MENU_ registos",
+            sZeroRecords: "Nenhum resultado encontrado",
+            sEmptyTable: "Nenhum dado disponível nesta tabela",
+            sInfo: "Mostrando _START_ a _END_ de _TOTAL_ registo(s)",
+            sInfoEmpty: "Mostrando 0 a 0 de 0 registos",
+            sInfoFiltered: "(filtrado de _MAX_ registos)",
+            sSearch: "Pesquisar:",
+
+            oPaginate: {
+                sLast: "<i class='fa-solid fa-angles-right' style='color:#63E6BE;'></i>",
+                sFirst: "<i class='fa-solid fa-angles-left' style='color:#63E6BE;'></i>",
+                sNext: "<i class='fa-solid fa-angle-right' style='color:#63E6BE;'></i>",
+                sPrevious: "<i class='fa-solid fa-angle-left' style='color:#63E6BE;'></i>"
+            }
+        },
+        autoWidth: false,
+        order: [[0, 'desc']],
+        pagingType: "full_numbers",
+        
     });
+});
 </script>
+
 </body>
+
 </html>

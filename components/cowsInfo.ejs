@@ -1,16 +1,16 @@
-<!-- Edit Cow Modal -->
+<!-- Info Cow Modal -->
 <div
   class="modal fade"
-  id="editCowModal"
+  id="infoCowModal"
   tabindex="-1"
-  aria-labelledby="editCowModalLabel"
+  aria-labelledby="infoCowModalLabel"
   aria-hidden="true"
 >
   <div class="modal-dialog">
     <div class="modal-content">
-      <form id="editCowForm" method="post">
+      <form id="infoCowForm" method="post">
         <div class="modal-header text-center">
-          <h5 class="modal-title w-100" id="editCowModalLabel">Editar Vaca</h5>
+          <h5 class="modal-title w-100" id="infoCowModalLabel">Vaca</h5>
           <button
             type="button"
             class="btn-close"
@@ -24,8 +24,9 @@
             <input
               type="number"
               class="form-control"
-              id="EditcowTag"
+              id="InfocowTag"
               name="tag"
+              readonly
             />
           </div>
           <div class="mb-3">
@@ -33,24 +34,26 @@
             <input
               type="number"
               class="form-control"
-              id="EditcowcheckDigit"
+              id="InfocowcheckDigit"
               name="checkDigit"
+              readonly
             />
           </div>
           <div class="mb-3">
             <label for="race">Raça:</label>
-              <select class="form-control" id="EditcowRace" name="race">
+              <select class="form-control" id="InfocowRace" name="race" disabled>
                 <option value="Angus">Angus</option>
                 <option value="Limousin">Limousin</option>
               </select>
           </div>
           <div class="mb-3">
-            <label for="cowBreedCount" class="form-label">Nº de Parições</label>
+            <label for="cowBreedCount" class="form-label">Nº de Pariçoes</label>
             <input
               type="number"
               class="form-control"
-              id="EditcowBreedCount"
+              id="InfocowBreedCount"
               name="breedCount"
+              readonly
             />
           </div>
           <div class="mb-3">
@@ -58,8 +61,9 @@
             <input
               type="date"
               class="form-control"
-              id="EditcowlastTimeCalved"
+              id="InfocowlastTimeCalved"
               name="lastTimeCalved"
+              readonly
             />
           </div>
           <div class="mb-3">
@@ -67,27 +71,22 @@
             <input
               type="date"
               class="form-control"
-              id="EditdateOfLastSanitation"
+              id="InfodateOfLastSanitation"
               name="lastTimeSanitized"
+              readonly
             />
           </div>
-
-          <div class="my-3">
+          <div class="mb-3">
             <label for="comments" class="form-label">Comentários/Observaçoes</label>
-            <textarea class="form-control" id="EditcowComments" name="comments" placeholder="Escreve aqui os teus comentarios..." rows="2" cols="30"></textarea>
+            <textarea class="form-control" id="InfocowComments" name="comments" placeholder="Escreve aqui os teus comentarios..." rows="2" cols="30" readonly></textarea>
           </div>
         </div>
           
         <div class="modal-footer">
-          <input type="hidden" name="id" id="EditcowId" />
-          <button
-            type="button"
-            class="btn btn-secondary"
-            data-bs-dismiss="modal"
-          >
-            Cancelar
-          </button>
-          <button type="submit" class="btn btn-success">Atualizar</button>
+          <input type="hidden" name="id" id="InfocowId"/>
+          <button type="button" class="btn btn-success" id="infoEditBtn">Editar</button>
+          <button type="button" class="btn btn-danger" id="infoDeleteBtn" data-bs-dismiss="modal"> Eliminar</button>
+          
         </div>
       </form>
     </div>

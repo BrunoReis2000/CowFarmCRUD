@@ -1,0 +1,65 @@
+<div class="table-responsive">
+        <% if (cows && cows.length > 0) { %>
+        <table class="table table-striped table-dark table-bordered table-hover my-3">
+          <thead>
+            <tr>
+              <th scope="col">Identificação</th>
+              <th scope="col">Check Digit</th>
+              <th class="col-hide-m" scope="col">Nº de Parições</th>
+              <th class="col-hide-m" scope="col">Data da última parição</th>
+              <th class="col-hide-m" scope="col">Data da última intervenção sanitária</th>
+              <th class="col-hide-m" scope="col">Comentários/Observaçoes</th>
+              <th scope="col">Ações</th>
+            </tr>
+          </thead>
+        <tbody>
+            <% cows.forEach((row, index) => { %>
+                <% if (row.race === 'Angus') { %>
+                <tr class="align-middle infoCowBtn"
+                    data-infoid="<%= row._id %>"
+                    data-infotag="<%= row.tag %>"
+                    data-infocheckDigit="<%= row.checkDigit %>"
+                    data-inforace="<%= row.race %>"
+                    data-infobreedcount="<%= row.breedCount %>"
+                    data-infolasttimecalved="<%= row.lastTimeCalved ? new Date(row.lastTimeCalved).toISOString().split('T')[0] : '' %>"
+                    data-infolasttimesanitized="<%= row.lastTimeSanitized ? new Date(row.lastTimeSanitized).toISOString().split('T')[0] : '' %>"
+                    data-infocomments="<%= row.comments %>"
+                    >
+                    <td><%= row.tag %></td>
+                    <td><%= row.checkDigit %></td>
+                    <td class="col-hide-m"><%= row.breedCount %></td>
+                    <td class="col-hide-m"><%= row.lastTimeCalved ? new Date(row.lastTimeCalved).toLocaleDateString() : '-' %></td>
+                    <td class="col-hide-m"><%= row.lastTimeSanitized ? new Date(row.lastTimeSanitized).toLocaleDateString() : '-' %></td>
+                    <td class="col-hide-m"><%= row.comments %> </td>
+                    <td class="actions-cell">
+                    <a
+                        type="button"
+                        class="editCowBtn"
+                        data-bs-toggle="modal"
+                        data-bs-target="#editCowModal"
+                        data-id="<%= row._id %>"
+                        data-tag="<%= row.tag %>"
+                        data-checkDigit="<%= row.checkDigit %>"
+                        data-race="<%= row.race %>"
+                        data-breedcount="<%= row.breedCount %>"
+                        data-lasttimecalved="<%= row.lastTimeCalved ? new Date(row.lastTimeCalved).toISOString().split('T')[0] : '' %>"
+                        data-lasttimesanitized="<%= row.lastTimeSanitized ? new Date(row.lastTimeSanitized).toISOString().split('T')[0] : '' %>"
+                        data-comments="<%= row.comments %>"
+                    >
+                        <i class="text-success fas fa-edit fa-lg"></i>
+                    </a>
+                    <a href="/deleteCow/<%= row._id %>"
+                        class="text-danger deleteCowBtn"
+                        data-id="/deleteCow/<%= row._id %>">
+                        <i class="fas fa-trash fa-lg"></i>
+                    </a>
+                    </td>
+                </tr>
+                <% } %>
+            <% }) %>
+            </tbody>
+        </table>
+      <% } else { %>
+        <h1 class="text-center text-secondary my-5">Não foram encontradas vacas Angus. Por favor adicione.</h1>
+      <% } %>
+      </div>
