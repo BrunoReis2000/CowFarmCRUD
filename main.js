@@ -20,6 +20,14 @@ db.once('open', () => console.log('Connected to Database'));
 app.use(express.urlencoded({extended: true}));
 app.use(express.json());
 
+const basicAuth = require('express-basic-auth');
+
+app.use(basicAuth({
+    users: { [process.env.USER]: process.env.PASSWORD }, // shared credentials
+    challenge: true, // shows browser login popup
+    realm: "CowManager"
+}));
+
 const path = require('path');
 app.use(express.static(path.resolve('components')));
 
