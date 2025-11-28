@@ -6,7 +6,12 @@ const session = require('express-session');
 
 
 const app = express();
-const PORT = process.env.PORT || 4000;
+const PORT = process.env.PORT || 3000;  // Fly will always provide PORT in env
+const HOST = "0.0.0.0";                 // Must bind to 0.0.0.0, not localhost
+
+app.listen(PORT, HOST, () => {
+  console.log(`Server running on http://${HOST}:${PORT}`);
+});
 
 //connect do mongodb database
 mongoose.connect(process.env.DB_URI);
