@@ -11,7 +11,7 @@ const app = express();
 // -------------------------
 // Server config
 // -------------------------
-const PORT = process.env.PORT || 3000;  // Fly provides PORT
+const PORT = process.env.PORT;  // Fly provides PORT
 const HOST = "0.0.0.0";                 // Must bind to 0.0.0.0 on Fly
 
 // -------------------------
