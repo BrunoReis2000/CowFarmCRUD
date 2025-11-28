@@ -30,7 +30,7 @@ app.use(basicAuth({
 
 const path = require('path');
 app.use(express.static(path.resolve('components')));
-
+app.use(express.static('public'));
 //esconder o secret no .env e meter o .env no .gitignore
 app.use(session({
     secret: process.env.SECRET || 'fallback_secret',
