@@ -1,51 +1,60 @@
-// import
+// Import
 require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const session = require('express-session');
-
+const basicAuth = require('express-basic-auth');
+const path = require('path');
 
 const app = express();
-const PORT = process.env.PORT || 3000;  // Fly will always provide PORT in env
-const HOST = "0.0.0.0";                 // Must bind to 0.0.0.0, not localhost
 
-app.listen(PORT, HOST, () => {
-  console.log(`Server running on http://${HOST}:${PORT}`);
+// -------------------------
+// Server config
+// -------------------------
+const PORT = process.env.PORT || 3000;  // Fly provides PORT
+const HOST = "0.0.0.0";                 // Must bind to 0.0.0.0 on Fly
+
+// -------------------------
+// MongoDB connection
+// -------------------------
+mongoose.connect(process.env.DB_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+    serverSelectionTimeoutMS: 10000, // fast fail if unreachable
 });
 
-//connect do mongodb database
-mongoose.connect(process.env.DB_URI);
 const db = mongoose.connection;
-db.on('error', (error) => console.error(error));
-db.once('open', () => console.log('Connected to Database'));
+db.on('error', (err) => console.error("MongoDB connection error:", err));
+db.once('open', () => console.log("Connected to MongoDB"));
 
-//middlewares -  software that acts as a bridge between an operating system or database and applications, especially on a network.
-//What is Middleware? It is those methods/functions/operations that are called BETWEEN processing the Request and sending the Response in your application method.
-
-app.use(express.urlencoded({extended: true}));
+// -------------------------
+// Middleware
+// -------------------------
+app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-const basicAuth = require('express-basic-auth');
+// Basic Auth (optional)
+if (process.env.USER && process.env.PASSWORD) {
+    app.use(basicAuth({
+        users: { [process.env.USER]: process.env.PASSWORD },
+        challenge: true,
+        realm: "CowManager"
+    }));
+}
 
-app.use(basicAuth({
-    users: { [process.env.USER]: process.env.PASSWORD }, // shared credentials
-    challenge: true, // shows browser login popup
-    realm: "CowManager"
-}));
-
-const path = require('path');
+// Static files
 app.use(express.static(path.resolve('components')));
 app.use('/favicons', express.static(path.join(__dirname, 'components/favicons')));
-console.log("Project root:", __dirname);
+app.use(express.static("uploads")); // optional, only if volume mounted
 
-//esconder o secret no .env e meter o .env no .gitignore
+// Session
 app.use(session({
     secret: process.env.SECRET || 'fallback_secret',
     saveUninitialized: true,
     resave: false,
     cookie: {
-        secure: false, // Render free tier does NOT require HTTPS inside the container
-        maxAge: 1000 * 60 * 60 * 24 // 1 day
+        secure: false,  // HTTPS not required inside Fly container
+        maxAge: 1000 * 60 * 60 * 24  // 1 day
     }
 }));
 
@@ -54,15 +63,20 @@ app.use((req, res, next) => {
     next();
 });
 
-
-app.use(express.static("uploads"));
-
-//set template engine - allows to use dynamic HTML pages with embeded js directly in html
+// -------------------------
+// Template engine
+// -------------------------
 app.set('view engine', 'ejs');
+if (process.env.NODE_ENV === "production") app.set("view cache", true);
 
-//route prefixes
+// -------------------------
+// Routes
+// -------------------------
 app.use("", require('./routes/routes'));
 
-app.listen(PORT, () => {
-    console.log(`Server is running on port localhost:${PORT}`);
+// -------------------------
+// Start server (only once)
+// -------------------------
+app.listen(PORT, HOST, () => {
+    console.log(`Server running on http://${HOST}:${PORT}`);
 });
