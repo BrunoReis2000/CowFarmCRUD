@@ -201,14 +201,8 @@ document.querySelectorAll('.infoSheepBtn').forEach(row => {
         #addBtnBack #addBtn {
           width: 80px;
           height: 80px;
-          border-radius: 50%;
-          background-color: #2a2f33;
-          border-color: #2a2f33;
+          
           transition: background-color 0.3s ease;
-        }
-        #addBtnBack:hover #addBtn {
-          background-color: #3a3f44;
-          border-color: #3a3f44;
         }
       }
 
@@ -338,6 +332,7 @@ td, th {
         }
 
         #addBtnBack {
+          cursor: pointer;
           display: flex;
           width: 80px;
           height: 80px;
@@ -352,21 +347,14 @@ td, th {
         }
         #addBtnBack:hover {
           background-color: #3a3f44;
+          border-color: #3a3f44;
         }
         #addBtnBack #addBtn {
           position: relative;
           z-index: 2;
-          background-color: #2a2f33;
-          border-color: #2a2f33;
-          width: 80px;
-          height: 80px;
-          border-radius: 100%;
-          transition: background-color 0.3s ease;
+          border: none;
         }
-        #addBtnBack:hover #addBtn {
-          background-color: #3a3f44;
-          border-color: #3a3f44;
-        }
+        
 
         .sidebar-buttons #cowDropdown {
           display: block;
@@ -519,7 +507,7 @@ td, th {
         <div id="addBtnBack">
           <button
             type="button"
-            class="btn btn-dark"
+            class="btn"
             id="addBtn"
             aria-label="Add"
             style="height: 48px; display: flex; align-items: center; justify-content: center;"
