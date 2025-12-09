@@ -1,10 +1,8 @@
-# fly.toml app configuration file generated for cowfarmcrud on 2025-12-09T14:56:59Z
-#
+# fly.toml app configuration file generated for cowfarmcrud
 # See https://fly.io/docs/reference/configuration/ for information about how to use this file.
-#
 
-app = 'cowfarmcrud'
-primary_region = 'fra'
+app = "cowfarmcrud"
+primary_region = "fra"
 
 [build]
 
@@ -23,7 +21,7 @@ primary_region = 'fra'
     handlers = ["tls", "http"]
     port = 443
 
-  [[services.concurrency]]
+  [services.concurrency]        # ✅ single table, not array
     type = "connections"
     hard_limit = 25
     soft_limit = 20
@@ -35,7 +33,7 @@ primary_region = 'fra'
     restart_limit = 0
 
 # Limit machine resources to free tier
-[[vm]]
-  size = "shared-cpu-1x"   # smallest CPU
-  memory = "256MB"         # free tier memory
-  count = 1                # only 1 machine
+[vm]                            # ✅ single table, not array
+  size = "shared-cpu-1x"        # smallest CPU
+  memory = "256MB"              # free tier memory
+  count = 1                     # only 1 machine
