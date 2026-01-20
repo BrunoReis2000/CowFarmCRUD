@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 const cowSchema = new mongoose.Schema({
     tag: {type: Number, required: true, unique: true},
-    checkDigit: {type: Number, required: true, unique: true},
+    checkDigit: {type: Number, required: true},
     race: {type: String, required: true},
     breedCount: {type: Number, required: false},
     lastTimeCalved: {type: Date, required: false},
