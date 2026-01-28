@@ -73,6 +73,11 @@ router.get('/', async (req, res) => {
     }
 });
 
+// Excel to JSON converter page
+router.get('/import', (req, res) => {
+    res.render('xlsxToJson');
+});
+
 
 router.post('/updateCow/:cowId', async (req, res) => {
     const id = req.params.cowId;
@@ -152,6 +157,50 @@ router.get('/deleteSheep/:sheepId', async (req, res) => {
     } catch (err) {
         console.log(err);
         res.json({ message: err.message, type: 'danger' });
+    }
+});
+
+// Bulk insert cows from JSON
+router.post('/bulkAddCows', async (req, res) => {
+    console.log('POST /bulkAddCows called');
+    console.log('Request body:', req.body);
+    
+    try {
+        const cowsData = req.body.cows;
+        console.log('Cows data:', cowsData);
+        
+        if (!Array.isArray(cowsData)) {
+            console.log('Invalid data format');
+            return res.status(400).json({ 
+                message: 'Invalid data format. Expected array of cows.',
+                type: 'danger' 
+            });
+        }
+
+        // Insert all cows
+        const result = await Cow.insertMany(cowsData, { ordered: false });
+        console.log(`Successfully inserted ${result.length} cows`);
+        
+        res.json({
+            message: `${result.length} vacas adicionadas com sucesso!`,
+            type: 'success',
+            inserted: result.length
+        });
+        
+    } catch (err) {
+        console.error('Error in bulkAddCows:', err);
+        // Handle duplicate key errors gracefully
+        if (err.code === 11000) {
+            res.status(400).json({ 
+                message: 'Algumas vacas já existem na base de dados (duplicatas ignoradas).',
+                type: 'warning'
+            });
+        } else {
+            res.status(500).json({ 
+                message: err.message, 
+                type: 'danger' 
+            });
+        }
     }
 });
 

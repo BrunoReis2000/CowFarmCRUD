@@ -68,6 +68,14 @@
               </label>
         </div>
 
+        <button class="btn" id="angus_btn">
+          ANGUS
+          </button>
+
+        <button class="btn" id="limousine_btn">
+          LIMOUSINE
+        </button>
+
         <button class="btn" id="convert_btn">
           Convert to JSON
           </button>
@@ -81,6 +89,13 @@
         <button class="btn" id="download_btn">
           Download JSON File
           </button>
+
+        <button class="btn" id="upload_btn" style="background-color: #28a745;">
+          Upload to MongoDB
+          </button>
+
+        <div id="upload_status" style="margin-top: 20px; padding: 10px; display: none; border-radius: 5px;">
+        </div>
     </div>
 
     <script src=
@@ -88,6 +103,28 @@
       </script>
 
     <script>
+
+// Global variable to track selected race
+let selectedRace = 'Angus';
+
+// Angus button handler
+document.getElementById("angus_btn").addEventListener("click", function () {
+    selectedRace = 'Angus';
+    this.style.backgroundColor = '#28a745';
+    document.getElementById("limousine_btn").style.backgroundColor = '#007bff';
+});
+
+// Limousine button handler
+document.getElementById("limousine_btn").addEventListener("click", function () {
+    selectedRace = 'Limousin';
+    this.style.backgroundColor = '#28a745';
+    document.getElementById("angus_btn").style.backgroundColor = '#007bff';
+});
+
+// Set default Angus button to green
+document.addEventListener('DOMContentLoaded', function () {
+    document.getElementById("angus_btn").style.backgroundColor = '#28a745';
+});
 
 document
   .getElementById("convert_btn")
@@ -99,18 +136,22 @@ document
       const HEADER_MAP = {
         "Marca de Exploração Nº Brinco": "tag",
         "VX33C Chk Digit": "checkDigit",
-        "Data Nas.": "data_nascimento",
+        "VX64I Chk Digit": "checkDigit",
+        //"Data Nas.": "data_nascimento",
         //"Sexo": "sexo",
         //"Data Ent. na Exp.": "data_entrada_exploracao",
         "Raça": "race",
-        "Data Últ. Parto": "lastTimeCalved"
+        "Data Últ. Parto": "lastTimeCalved",
       };
 
       // 🧠 Tipos esperados por campo
       const FIELD_TYPES = {
+        tag: "string",
         checkDigit: "number",
+        race: "string",
         data_nascimento: "date",
-        lastTimeCalved: "date"
+        lastTimeCalved: "date",
+        comments: "string"
       };
 
       // 🔧 Função de cast segura
@@ -165,7 +206,6 @@ document
                   colIndex: colIndex + 1
                 };
               }
-
               return null;
             })
             .filter(Boolean);
@@ -177,14 +217,32 @@ document
             // Fim normal da tabela
             if (!row || !row[1]) break;
 
-            const obj = {};
+            // Extract original race value first
+            let originalRace = "-";
+            const raceHeader = headers.find(h => h.key === 'race');
+            if (raceHeader && row[raceHeader.colIndex]) {
+              originalRace = castValue(row[raceHeader.colIndex], FIELD_TYPES['race']);
+            }
+
+            const obj = {
+              comments: originalRace,
+            };
 
             headers.forEach(h => {
-              obj[h.key] = castValue(
-                row[h.colIndex],
-                FIELD_TYPES[h.key]
-              );
+                if(h.key == 'race'){
+                    obj[h.key] = castValue(
+                    selectedRace,
+                    FIELD_TYPES[h.key]
+                    );
+                } else {
+                    obj[h.key] = castValue(
+                    row[h.colIndex],
+                    FIELD_TYPES[h.key]
+                    );
+                }
+              
             });
+            
 
             // ❗ Ignorar footer "Total de Aleitantes"
             if (
@@ -220,6 +278,88 @@ document
                 const jsonData = document.getElementById("json_data").value;
                 downloadObjectAsJson(jsonData, "excel_to_json");
             });
+
+        document
+            .getElementById("upload_btn")
+            .addEventListener("click", async function () {
+                const jsonDataStr = document.getElementById("json_data").value;
+                
+                if (!jsonDataStr || jsonDataStr.trim() === '') {
+                    showStatus('Por favor, converta um arquivo Excel primeiro!', 'warning');
+                    return;
+                }
+
+                try {
+                    const cows = JSON.parse(jsonDataStr);
+                    
+                    if (!Array.isArray(cows)) {
+                        showStatus('Erro: Dados inválidos. Esperado um array de vacas.', 'danger');
+                        return;
+                    }
+
+                    // Disable button and show loading
+                    const uploadBtn = document.getElementById("upload_btn");
+                    uploadBtn.disabled = true;
+                    uploadBtn.textContent = "Enviando...";
+
+                    const response = await fetch('/bulkAddCows', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        credentials: 'include',
+                        body: JSON.stringify({ cows: cows })
+                    });
+
+                    // Get response text first to handle potential non-JSON responses
+                    const responseText = await response.text();
+                    
+                    let result;
+                    try {
+                        result = JSON.parse(responseText);
+                    } catch (parseErr) {
+                        console.error('Response text:', responseText);
+                        showStatus(`Erro no servidor: ${response.status} ${response.statusText}. Verifique a consola do navegador.`, 'danger');
+                        return;
+                    }
+
+                    if (response.ok) {
+                        showStatus(`✓ ${result.message}`, 'success');
+                    } else {
+                        showStatus(`✗ ${result.message}`, result.type || 'danger');
+                    }
+
+                } catch (err) {
+                    showStatus(`Erro: ${err.message}`, 'danger');
+                    console.error('Upload error:', err);
+                } finally {
+                    const uploadBtn = document.getElementById("upload_btn");
+                    uploadBtn.disabled = false;
+                    uploadBtn.textContent = "Upload to MongoDB";
+                }
+            });
+
+        function showStatus(message, type) {
+            const statusDiv = document.getElementById("upload_status");
+            statusDiv.textContent = message;
+            statusDiv.style.display = 'block';
+            
+            // Set background color based on type
+            const colors = {
+                'success': '#d4edda',
+                'danger': '#f8d7da',
+                'warning': '#fff3cd'
+            };
+            const textColors = {
+                'success': '#155724',
+                'danger': '#721c24',
+                'warning': '#856404'
+            };
+            
+            statusDiv.style.backgroundColor = colors[type] || colors['danger'];
+            statusDiv.style.color = textColors[type] || textColors['danger'];
+            statusDiv.style.border = `1px solid ${textColors[type] || textColors['danger']}`;
+        }
 
         function downloadObjectAsJson(jsonData, filename) {
             const dataStr =
