@@ -1,0 +1,238 @@
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0" />
+    <title>Excel to JSON Converter</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+
+        .input-container {
+            margin-bottom: 20px;
+        }
+
+        .input-container input[type="file"] {
+            display: none;
+        }
+
+        .input-container label {
+            display: block;
+            padding: 10px 15px;
+            background-color: #007bff;
+            color: #fff;
+            text-align: center;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        .input-container label:hover {
+            background-color: #0056b3;
+        }
+
+        .btn {
+            padding: 10px 15px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .btn:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="input-container">
+            <input type="file" id="excel_file" 
+                   accept=".xlsx, .xls" />
+            <label for="excel_file">
+              Select Excel File
+              </label>
+        </div>
+
+        <button class="btn" id="convert_btn">
+          Convert to JSON
+          </button>
+
+        <div class="input-container">
+            <textarea id="json_data" rows="10" 
+                      cols="50" readonly>
+              </textarea>
+        </div>
+
+        <button class="btn" id="download_btn">
+          Download JSON File
+          </button>
+    </div>
+
+    <script src=
+"https://unpkg.com/read-excel-file@5.8.8/bundle/read-excel-file.min.js">
+      </script>
+
+    <script>
+
+document
+  .getElementById("convert_btn")
+  .addEventListener("click", function () {
+    const input = document.getElementById("excel_file");
+
+    readXlsxFile(input.files[0]).then(function (rows) {
+
+      const HEADER_MAP = {
+        "Marca de Exploração Nº Brinco": "tag",
+        "VX33C Chk Digit": "checkDigit",
+        "Data Nas.": "data_nascimento",
+        //"Sexo": "sexo",
+        //"Data Ent. na Exp.": "data_entrada_exploracao",
+        "Raça": "race",
+        "Data Últ. Parto": "lastTimeCalved"
+      };
+
+      // 🧠 Tipos esperados por campo
+      const FIELD_TYPES = {
+        checkDigit: "number",
+        data_nascimento: "date",
+        lastTimeCalved: "date"
+      };
+
+      // 🔧 Função de cast segura
+      function castValue(value, type) {
+        if (value == null || value === '') return null;
+
+        switch (type) {
+          case "number": {
+            const n = Number(
+              String(value)
+                .replace(',', '.')
+                .replace(/\s/g, '')
+            );
+            return Number.isNaN(n) ? null : n;
+          }
+
+          case "date":
+            return value instanceof Date
+              ? value.toISOString().split('T')[0]
+              : null;
+
+          default:
+            return String(value).trim();
+        }
+      }
+
+      const jsonData = [];
+      let i = 0;
+
+      while (i < rows.length) {
+        const cell = rows[i][0];
+
+        if (cell && String(cell).startsWith("Nº Cont.")) {
+          const headerRow = rows[i + 1];
+          let dataIndex = i + 2;
+
+          if (!headerRow) break;
+
+          const headers = headerRow
+            .slice(1)
+            .map((h, colIndex) => {
+              const original = String(h || '');
+
+              const normalized = original
+                .replace(/\r?\n/g, ' ')
+                .replace(/\s+/g, ' ')
+                .trim();
+
+              if (HEADER_MAP[normalized]) {
+                return {
+                  key: HEADER_MAP[normalized],
+                  colIndex: colIndex + 1
+                };
+              }
+
+              return null;
+            })
+            .filter(Boolean);
+
+          // Dados
+          while (dataIndex < rows.length) {
+            const row = rows[dataIndex];
+
+            // Fim normal da tabela
+            if (!row || !row[1]) break;
+
+            const obj = {};
+
+            headers.forEach(h => {
+              obj[h.key] = castValue(
+                row[h.colIndex],
+                FIELD_TYPES[h.key]
+              );
+            });
+
+            // ❗ Ignorar footer "Total de Aleitantes"
+            if (
+              obj.tag &&
+              String(obj.tag).trim() === "Total de Aleitantes"
+            ) {
+              dataIndex++;
+              continue;
+            }
+
+            jsonData.push(obj);
+            dataIndex++;
+          }
+
+          i = dataIndex;
+          continue;
+        }
+
+        i++;
+      }
+
+      document.getElementById("json_data").value = JSON.stringify(
+        jsonData,
+        null,
+        2
+      );
+    });
+  });
+
+        document
+            .getElementById("download_btn")
+            .addEventListener("click", function () {
+                const jsonData = document.getElementById("json_data").value;
+                downloadObjectAsJson(jsonData, "excel_to_json");
+            });
+
+        function downloadObjectAsJson(jsonData, filename) {
+            const dataStr =
+                "data:text/json;charset=utf-8," + 
+                  encodeURIComponent(jsonData);
+            const downloadAnchorNode = document.createElement("a");
+            downloadAnchorNode.setAttribute("href", dataStr);
+            downloadAnchorNode.setAttribute("download", filename + ".json");
+            document.body.appendChild(downloadAnchorNode);
+            downloadAnchorNode.click();
+            downloadAnchorNode.remove();
+        }
+    </script>
+</body>
+
+</html>
