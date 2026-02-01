@@ -5,6 +5,7 @@
             <tr>
               <th scope="col">Identificação</th>
               <th scope="col">Check Digit</th>
+              <th class="col-hide-m" scope="col">Data de nascimento</th>
               <th class="col-hide-m" scope="col">Nº de Parições</th>
               <th class="col-hide-m" scope="col">Data da última parição</th>
               <th class="col-hide-m" scope="col">Data da última intervenção sanitária</th>
@@ -19,14 +20,16 @@
                     data-infoid="<%= row._id %>"
                     data-infotag="<%= row.tag %>"
                     data-infocheckDigit="<%= row.checkDigit %>"
+                    data-infobirthDate="<%= row.birthDate ? new Date(row.birthDate).toISOString().split('T')[0] : '' %>"
                     data-inforace="<%= row.race %>"
                     data-infobreedcount="<%= row.breedCount %>"
                     data-infolasttimecalved="<%= row.lastTimeCalved ? new Date(row.lastTimeCalved).toISOString().split('T')[0] : '' %>"
                     data-infolasttimesanitized="<%= row.lastTimeSanitized ? new Date(row.lastTimeSanitized).toISOString().split('T')[0] : '' %>"
                     data-infocomments="<%= row.comments %>"
                     >
-                    <td><%= row.tag %></td>
                     <td><%= row.checkDigit %></td>
+                    <td><%= row.tag %></td>
+                    <td class="col-hide-m"><%= row.birthDate ? new Date(row.birthDate).toLocaleDateString() : '-' %></td>
                     <td class="col-hide-m"><%= row.breedCount %></td>
                     <td class="col-hide-m"><%= row.lastTimeCalved ? new Date(row.lastTimeCalved).toLocaleDateString() : '-' %></td>
                     <td class="col-hide-m"><%= row.lastTimeSanitized ? new Date(row.lastTimeSanitized).toLocaleDateString() : '-' %></td>
@@ -40,6 +43,7 @@
                         data-id="<%= row._id %>"
                         data-tag="<%= row.tag %>"
                         data-checkDigit="<%= row.checkDigit %>"
+                        data-birthDate="<%= row.birthDate ? new Date(row.birthDate).toISOString().split('T')[0] : '' %>"
                         data-race="<%= row.race %>"
                         data-breedcount="<%= row.breedCount %>"
                         data-lasttimecalved="<%= row.lastTimeCalved ? new Date(row.lastTimeCalved).toISOString().split('T')[0] : '' %>"

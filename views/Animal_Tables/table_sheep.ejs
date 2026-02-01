@@ -3,8 +3,9 @@
         <table class="table table-striped table-dark table-bordered table-hover my-3">
           <thead>
             <tr>
-              <th scope="col">Identificação</th>
               <th scope="col">Check Digit</th>
+              <th scope="col">Identificação</th>
+              <th class="col-hide-m" scope="col">Data de nascimento</th>
               <th class="col-hide-m" scope="col">Nº de Parições</th>
               <th class="col-hide-m" scope="col">Data da última parição</th>
               <th class="col-hide-m" scope="col">Data da última intervenção sanitária</th>
@@ -15,16 +16,18 @@
         <tbody>
           <% sheeps.forEach((row, index) => { %>
             <tr class="align-middle infoSheepBtn"
-                data-infoid="<%= row._id %>"
                 data-infotag="<%= row.tag %>"
+                data-infoid="<%= row._id %>"
                 data-infocheckDigit="<%= row.checkDigit %>"
+                data-infobirthDate="<%= row.birthDate ? new Date(row.birthDate).toISOString().split('T')[0] : '' %>"
                 data-infobreedcount="<%= row.breedCount %>"
                 data-infolasttimecalved="<%= row.lastTimeCalved ? new Date(row.lastTimeCalved).toISOString().split('T')[0] : '' %>"
                 data-infodateoflastsanitation="<%= row.dateOfLastSanitation ? new Date(row.dateOfLastSanitation).toISOString().split('T')[0] : '' %>"
                 data-infocomments="<%= row.comments %>"
               >
-              <td><%= row.tag %></td>
               <td><%= row.checkDigit %></td>
+              <td><%= row.tag %></td>
+              <td class="col-hide-m"><%= row.birthDate ? new Date(row.birthDate).toLocaleDateString() : '-' %></td>
               <td class="col-hide-m"><%= row.breedCount %></td>
               <td class="col-hide-m"><%= row.lastTimeCalved ? new Date(row.lastTimeCalved).toLocaleDateString() : '-' %></td>
               <td class="col-hide-m"><%= row.dateOfLastSanitation ? new Date(row.dateOfLastSanitation).toLocaleDateString() : '-' %></td>
@@ -37,6 +40,7 @@
                   data-bs-target="#editSheepModal"
                   data-id="<%= row._id %>"
                   data-tag="<%= row.tag %>"
+                  data-birthDate="<%= row.birthDate ? new Date(row.birthDate).toISOString().split('T')[0] : '' %>"
                   data-checkDigit="<%= row.checkDigit %>"
                   data-breedcount="<%= row.breedCount %>"
                   data-lasttimecalved="<%= row.lastTimeCalved ? new Date(row.lastTimeCalved).toISOString().split('T')[0] : '' %>"

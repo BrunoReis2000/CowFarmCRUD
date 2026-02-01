@@ -16,6 +16,7 @@ router.post('/add', async (req, res) => {
             tag: req.body.tag,
             checkDigit: req.body.checkDigit,
             race: req.body.race,
+            birthDate: req.body.birthDate,
             breedCount: req.body.breedCount,
             lastTimeCalved: req.body.lastTimeCalved,
             lastTimeSanitized: req.body.lastTimeSanitized,
@@ -39,6 +40,7 @@ router.post('/addSheep', async (req, res) => {
             
             tag: req.body.tag,
             checkDigit: req.body.checkDigit,
+            birthDate: req.body.birthDate,
             breedCount: req.body.breedCount,
             lastTimeCalved: req.body.lastTimeCalved,
             dateOfLastSanitation: req.body.dateOfLastSanitation,
@@ -87,6 +89,7 @@ router.post('/updateCow/:cowId', async (req, res) => {
             tag: req.body.tag,
             checkDigit: req.body.checkDigit,
             race: req.body.race,
+            birthDate: req.body.birthDate,
             breedCount: req.body.breedCount,
             lastTimeCalved: req.body.lastTimeCalved,
             lastTimeSanitized: req.body.lastTimeSanitized,
@@ -112,6 +115,7 @@ router.post('/updateSheep/:sheepId', async (req, res) => {
             tag: req.body.tag,
             checkDigit: req.body.checkDigit,
             breedCount: req.body.breedCount,
+            birthDate: req.body.birthDate,
             lastTimeCalved: req.body.lastTimeCalved,
             dateOfLastSanitation: req.body.dateOfLastSanitation,
             comments: req.body.comments
