@@ -1,3 +1,26 @@
+// Helper function to safely format dates
+function formatDateForInput(dateValue) {
+    if (!dateValue) return '';
+    try {
+        // If it's already in ISO format (YYYY-MM-DD), just return it
+        if (/^\d{4}-\d{2}-\d{2}$/.test(dateValue)) {
+            return dateValue;
+        }
+        const date = new Date(dateValue);
+        // Check if date is valid
+        if (isNaN(date.getTime())) {
+            return '';
+        }
+        // Check if it's the exact epoch timestamp (0) - which indicates an empty/null date
+        if (date.getTime() === 0) {
+            return '';
+        }
+        return date.toISOString().split('T')[0];
+    } catch (e) {
+        return '';
+    }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     const editButtons = document.querySelectorAll('.editCowBtn');
     const form = document.querySelector('#editCowForm');
@@ -32,10 +55,10 @@ document.addEventListener('DOMContentLoaded', () => {
             tagInput.value = tag;
             checkDigitInput.value = checkDigit;
             raceInput.value = race;
-            birthDateInput.value = brithDate ? new Date(brithDate).toISOString().split('T')[0] : '';
+            birthDateInput.value = formatDateForInput(brithDate);
             breedCountInput.value = breedCount;
-            lastTimeInput.value = lastTimeCalved ? new Date(lastTimeCalved).toISOString().split('T')[0] : '';
-            lastSanitationInput.value = lastTimeSanitized ? new Date(lastTimeSanitized).toISOString().split('T')[0] : '';
+            lastTimeInput.value = formatDateForInput(lastTimeCalved);
+            lastSanitationInput.value = formatDateForInput(lastTimeSanitized);
             commentsInput.value = comments;
 
             // Update form action dynamically

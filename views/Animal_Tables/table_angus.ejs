@@ -19,7 +19,7 @@
                 <tr class="align-middle infoCowBtn"
                     data-infoid="<%= row._id %>"
                     data-infotag="<%= row.tag %>"
-                    data-infobirthDate="<%= row.birthDate ? new Date(row.lastTimeCalved).toISOString().split('T')[0] : '' %>"
+                    data-infobirthDate="<%= row.birthDate ? new Date(row.birthDate).toISOString().split('T')[0] : '' %>"
                     data-infocheckDigit="<%= row.checkDigit %>"
                     data-inforace="<%= row.race %>"
                     data-infobreedcount="<%= row.breedCount %>"

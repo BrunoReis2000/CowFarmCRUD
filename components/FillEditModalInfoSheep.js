@@ -1,3 +1,26 @@
+// Helper function to safely format dates
+function formatDateForInput(dateValue) {
+    if (!dateValue) return '';
+    try {
+        // If it's already in ISO format (YYYY-MM-DD), just return it
+        if (/^\d{4}-\d{2}-\d{2}$/.test(dateValue)) {
+            return dateValue;
+        }
+        const date = new Date(dateValue);
+        // Check if date is valid
+        if (isNaN(date.getTime())) {
+            return '';
+        }
+        // Check if it's the exact epoch timestamp (0) - which indicates an empty/null date
+        if (date.getTime() === 0) {
+            return '';
+        }
+        return date.toISOString().split('T')[0];
+    } catch (e) {
+        return '';
+    }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     const infoButtons = document.querySelectorAll('.infoSheepBtn');
 
@@ -28,11 +51,11 @@ document.addEventListener('DOMContentLoaded', () => {
             idInput.value = sheepId;
             tagInput.value = tag;
             checkDigitInput.value = checkDigit;
-            birthDateInput.value = birthDate ? new Date(birthDate).toISOString().split('T')[0] : '';
+            birthDateInput.value = formatDateForInput(birthDate);
             breedCountInput.value = breedCount;
-            lastTimeInput.value = lastTimeCalved ? new Date(lastTimeCalved).toISOString().split('T')[0] : '';
+            lastTimeInput.value = formatDateForInput(lastTimeCalved);
             commentsInput.value = comments;
-            lastSanitationInput.value = lastTimeSanitized ? new Date(lastTimeSanitized).toISOString().split('T')[0] : '';
+            lastSanitationInput.value = formatDateForInput(lastTimeSanitized);
             
 
             // Update form action dynamically
