@@ -29,10 +29,10 @@
                     >
                     <td><%= row.checkDigit %></td>
                     <td><%= row.tag %></td>
-                    <td class="col-hide-m"><%= row.birthDate ? new Date(row.birthDate).toLocaleDateString() : '-' %></td>
+                    <td class="col-hide-m"><%= row.birthDate ? new Date(row.birthDate).toLocaleDateString('pt-PT') : '-' %></td>
                     <td class="col-hide-m"><%= row.breedCount %></td>
-                    <td class="col-hide-m"><%= row.lastTimeCalved ? new Date(row.lastTimeCalved).toLocaleDateString() : '-' %></td>
-                    <td class="col-hide-m"><%= row.lastTimeSanitized ? new Date(row.lastTimeSanitized).toLocaleDateString() : '-' %></td>
+                    <td class="col-hide-m"><%= row.lastTimeCalved ? new Date(row.lastTimeCalved).toLocaleDateString('pt-PT') : '-' %></td>
+                    <td class="col-hide-m"><%= row.lastTimeSanitized ? new Date(row.lastTimeSanitized).toLocaleDateString('pt-PT') : '-' %></td>
                     <td class="col-hide-m"><%= row.comments %> </td>
                     <td class="actions-cell">
                     <a
