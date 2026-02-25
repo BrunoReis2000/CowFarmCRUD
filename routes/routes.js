@@ -85,16 +85,24 @@ router.post('/updateCow/:cowId', async (req, res) => {
     const id = req.params.cowId;
 
     try {
-        await Cow.findByIdAndUpdate(id, {
-            tag: req.body.tag,
-            checkDigit: req.body.checkDigit,
-            race: req.body.race,
-            birthDate: req.body.birthDate,
-            breedCount: req.body.breedCount,
-            lastTimeCalved: req.body.lastTimeCalved,
-            lastTimeSanitized: req.body.lastTimeSanitized,
-            comments: req.body.comments
-        });
+        await Cow.findByIdAndUpdate(
+            id,
+            {
+                $set: {
+                    tag: req.body.tag,
+                    checkDigit: req.body.checkDigit,
+                    race: req.body.race,
+                    birthDate: req.body.birthDate,
+                    breedCount: req.body.breedCount,
+                    lastTimeCalved: req.body.lastTimeCalved,
+                    lastTimeSanitized: req.body.lastTimeSanitized,
+                    comments: req.body.comments,
+                    updatedAt: new Date()
+                },
+                $inc: { version: 1 }
+            },
+            { new: true }
+        );
 
         req.session.message = {
             type: "success",
@@ -110,16 +118,23 @@ router.post('/updateSheep/:sheepId', async (req, res) => {
     const id = req.params.sheepId;
 
     try {
-        await Sheep.findByIdAndUpdate(id, {
-
-            tag: req.body.tag,
-            checkDigit: req.body.checkDigit,
-            breedCount: req.body.breedCount,
-            birthDate: req.body.birthDate,
-            lastTimeCalved: req.body.lastTimeCalved,
-            dateOfLastSanitation: req.body.dateOfLastSanitation,
-            comments: req.body.comments
-        });
+        await Sheep.findByIdAndUpdate(
+            id,
+            {
+                $set: {
+                    tag: req.body.tag,
+                    checkDigit: req.body.checkDigit,
+                    breedCount: req.body.breedCount,
+                    birthDate: req.body.birthDate,
+                    lastTimeCalved: req.body.lastTimeCalved,
+                    dateOfLastSanitation: req.body.dateOfLastSanitation,
+                    comments: req.body.comments,
+                    updatedAt: new Date()
+                },
+                $inc: { version: 1 }
+            },
+            { new: true }
+        );
 
         req.session.message = {
             type: "success",

@@ -5,6 +5,8 @@ const mongoose = require('mongoose');
 const session = require('express-session');
 const basicAuth = require('express-basic-auth');
 const path = require('path');
+const Cow = require('./models/cows');
+const Sheep = require('./models/sheeps');
 
 const app = express();
 
@@ -25,7 +27,66 @@ mongoose.connect(process.env.DB_URI, {
 
 const db = mongoose.connection;
 db.on('error', (err) => console.error("MongoDB connection error:", err));
-db.once('open', () => console.log("Connected to MongoDB"));
+db.once('open', () => {
+    console.log("Connected to MongoDB");
+    startChangeStreamWatcher();
+});
+db.on('disconnected', () => {
+    stopChangeStreamWatcher();
+});
+
+// -------------------------
+// Change stream + SSE refresh
+// -------------------------
+let cowStream = null;
+let sheepStream = null;
+let changeStreamStarted = false;
+const sseClients = new Set();
+
+function broadcastRefresh(payload) {
+    const data = `data: ${JSON.stringify(payload)}\n\n`;
+    for (const res of sseClients) {
+        try {
+            res.write(data);
+        } catch (e) {
+            sseClients.delete(res);
+        }
+    }
+}
+
+function startChangeStreamWatcher() {
+    if (changeStreamStarted) return;
+    if (mongoose.connection.readyState !== 1) return;
+
+    try {
+        cowStream = Cow.watch();
+        sheepStream = Sheep.watch();
+        changeStreamStarted = true;
+
+        cowStream.on('change', (change) => {
+            broadcastRefresh({ collection: 'cows', operationType: change.operationType });
+        });
+
+        sheepStream.on('change', (change) => {
+            broadcastRefresh({ collection: 'sheeps', operationType: change.operationType });
+        });
+    } catch (err) {
+        console.warn('[CHANGE STREAM] Failed to start watcher:', err.message);
+    }
+}
+
+function stopChangeStreamWatcher() {
+    try {
+        if (cowStream) cowStream.close();
+        if (sheepStream) sheepStream.close();
+    } catch (err) {
+        console.warn('[CHANGE STREAM] Failed to stop watcher:', err.message);
+    } finally {
+        cowStream = null;
+        sheepStream = null;
+        changeStreamStarted = false;
+    }
+}
 
 // -------------------------
 // Middleware
@@ -61,6 +122,23 @@ app.use(session({
 app.use((req, res, next) => {
     res.locals.message = req.session.message;
     next();
+});
+
+// Server-Sent Events endpoint for live refresh
+app.get('/events', (req, res) => {
+    res.setHeader('Content-Type', 'text/event-stream');
+    res.setHeader('Cache-Control', 'no-cache');
+    res.setHeader('Connection', 'keep-alive');
+    res.flushHeaders();
+
+    res.write('event: connected\n');
+    res.write('data: ok\n\n');
+
+    sseClients.add(res);
+
+    req.on('close', () => {
+        sseClients.delete(res);
+    });
 });
 
 // -------------------------

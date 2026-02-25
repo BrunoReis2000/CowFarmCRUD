@@ -45,6 +45,26 @@ $(document).ready(function () {
 });
 </script>
 
+<script>
+    (function () {
+        if (!window.EventSource) return;
+
+        let reloadTimer = null;
+        const source = new EventSource('/events');
+
+        source.onmessage = function () {
+            clearTimeout(reloadTimer);
+            reloadTimer = setTimeout(function () {
+                window.location.reload();
+            }, 500);
+        };
+
+        window.addEventListener('beforeunload', function () {
+            source.close();
+        });
+    })();
+</script>
+
 </body>
 
 </html>
